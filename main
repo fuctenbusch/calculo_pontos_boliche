@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-//codigo inicial = teste1 
-
 void main() {
   runApp(BowlingApp());
 }
@@ -10,235 +8,109 @@ class BowlingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bowling Scorer',
+      title: 'Bowling Score Calculator',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        primarySwatch: Colors.lightGreen,
       ),
-      home: BowlingGame(),
+      home: BowlingScreen(),
     );
   }
 }
 
-class BowlingGame extends StatefulWidget {
+class BowlingScreen extends StatefulWidget {
   @override
-  _BowlingGameState createState() => _BowlingGameState();
+  _BowlingScreenState createState() => _BowlingScreenState();
 }
 
-class _BowlingGameState extends State<BowlingGame> {
-  List<List<int>> scores = List.generate(10, (_) => [], growable: false);
+class _BowlingScreenState extends State<BowlingScreen> {
+  List<int> rolls = [];
+  int maxPossibleScore = 300;
 
-  void _updateScore(int frame, int shot, int pins) {
+  void _addRoll(int pins) {
     setState(() {
-      scores[frame].add(pins);
+      rolls.add(pins);
     });
   }
 
+  void _deleteLastRoll() {
+    if (rolls.isNotEmpty) {
+      setState(() {
+        rolls.removeLast();
+      });
+    }
+  }
+
   int _calculateScore() {
-    int totalScore = 0;
-    int frame = 0;
+    int score = 0;
+    int rollIndex = 0;
 
-    for (int i = 0; i < scores.length; i++) {
-      if (scores[i].isEmpty) break;
-
-      totalScore += scores[i].reduce((a, b) => a + b);
-
-      if (scores[i].length == 2 || i == 9) {
-        if (scores[i][0] == 10) {
-          totalScore += _getStrikeBonus(frame + 1);
-        } else if (scores[i][0] + scores[i][1] == 10) {
-          totalScore += _getSpareBonus(frame + 1);
+    for (int frame = 0; frame < 10 && rollIndex < rolls.length; frame++) {
+      if (rolls[rollIndex] == 10) {
+        // Strike
+        if (rollIndex + 2 < rolls.length) {
+          score += 10 + rolls[rollIndex + 1] + rolls[rollIndex + 2];
         }
-        frame++;
+        rollIndex += 1;
+      } else if (rollIndex + 1 < rolls.length &&
+          rolls[rollIndex] + rolls[rollIndex + 1] == 10) {
+        // Spare
+        if (rollIndex + 2 < rolls.length) {
+          score += 10 + rolls[rollIndex + 2];
+        }
+        rollIndex += 2;
+      } else if (rollIndex + 1 < rolls.length) {
+        // Open frame
+        score += rolls[rollIndex] + rolls[rollIndex + 1];
+        rollIndex += 2;
       }
     }
 
-    return totalScore;
-  }
-
-  int _getStrikeBonus(int nextFrame) {
-    if (nextFrame < scores.length) {
-      if (scores[nextFrame].length >= 2) {
-        return scores[nextFrame][0] + scores[nextFrame][1];
-      }
-    }
-    return 0;
-  }
-
-  int _getSpareBonus(int nextFrame) {
-    if (nextFrame < scores.length) {
-      if (scores[nextFrame].isNotEmpty) {
-        return scores[nextFrame][0];
-      }
-    }
-    return 0;
-  }
-
-  int _calculateMaxScore() {
-    int maxScore = 0;
-
-    for (int i = 0; i < 10; i++) {
-      if (i < 8) {
-        maxScore += 30;
-      } else if (i == 8) {
-        maxScore += 30 + 20;
-      } else {
-        maxScore += 30 + 20 + 10;
-      }
-    }
-
-    return maxScore;
+    return score;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bowling Scorer'),
+        title: Text('Bowling Score Calculator'),
       ),
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
-            Text(
-              'Total Score: ${_calculateScore()}',
-              style: TextStyle(fontSize: 24),
+            SizedBox(height: 5),
+            Image.asset(
+              'assets/images/pistaboliche.png',
+              width: 350,
+              height: 350,
             ),
             Text(
-              'Max Score: ${_calculateMaxScore()}',
-              style: TextStyle(fontSize: 18),
+              'Current Score: ${_calculateScore()}',
+              style: TextStyle(fontSize: 20),
             ),
             SizedBox(height: 20),
-            BowlingInput(scores, _updateScore),
+            Text(
+              'Max Possible Score: $maxPossibleScore',
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (int pins = 0; pins <= 10; pins++)
+                  ElevatedButton(
+                    onPressed: () => _addRoll(pins),
+                    child: Text(pins.toString()),
+                  ),
+                ElevatedButton(
+                  onPressed: _deleteLastRoll,
+                  child: Text('Undo'),
+                ),
+              ],
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class BowlingInput extends StatefulWidget {
-  final List<List<int>> scores;
-  final Function(int, int, int) updateScore;
-
-  BowlingInput(this.scores, this.updateScore);
-
-  @override
-  _BowlingInputState createState() => _BowlingInputState();
-}
-
-class _BowlingInputState extends State<BowlingInput> {
-  int currentFrame = 0;
-  int currentShot = 0;
-
-  void _updateScore(int pins) {
-    if (currentFrame < widget.scores.length) {
-      if (currentShot == 0 && pins == 10) {
-        widget.updateScore(currentFrame, currentShot, pins);
-        currentFrame++;
-      } else if (currentShot == 1 || currentFrame == 9) {
-        widget.updateScore(currentFrame, currentShot, pins);
-        currentFrame++;
-        currentShot = 0;
-      } else {
-        widget.updateScore(currentFrame, currentShot, pins);
-        currentShot++;
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            10,
-            (index) => Container(
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: currentFrame == index
-                    ? Colors.deepPurpleAccent
-                    : widget.scores[index].isEmpty
-                        ? Colors.grey
-                        : Colors.green,
-              ),
-              child: Center(
-                child: Text(
-                  (index + 1).toString(),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            10,
-            (index) => Container(
-              margin: EdgeInsets.symmetric(horizontal: 4),
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: currentFrame == index
-                    ? Colors.deepPurpleAccent
-                    : Colors.grey,
-              ),
-              child: Center(
-                child: Text(
-                  widget.scores[index].isNotEmpty
-                      ? widget.scores[index].join(' ')
-                      : '-',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            10,
-            (index) => GestureDetector(
-              onTap: () => _updateScore(index + 1),
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 4),
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: currentFrame < widget.scores.length &&
-                          widget.scores[currentFrame].length == currentShot
-                      ? Colors.deepPurpleAccent
-                      : Colors.grey,
-                ),
-                child: Center(
-                  child: Text(
-                    (index + 1).toString(),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
