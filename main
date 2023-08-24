@@ -94,6 +94,66 @@ class _BowlingScreenState extends State<BowlingScreen> {
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 20),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (int frame = 1; frame <= 9; frame++)
+                    Container(
+                      margin: EdgeInsets.all(8),
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.lightGreen,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Frame $frame',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            rolls.length >= (frame - 1) * 2 + 1
+                                ? rolls[(frame - 1) * 2].toString()
+                                : '-',
+                          ),
+                          Text(
+                            rolls.length >= (frame - 1) * 2 + 2
+                                ? rolls[(frame - 1) * 2 + 1].toString()
+                                : '-',
+                          ),
+                        ],
+                      ),
+                    ),
+                  Container(
+                    margin: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.lightGreen,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Frame 10',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(rolls.length >= 18 ? rolls[18].toString() : '-'),
+                        Text(rolls.length >= 19 ? rolls[19].toString() : '-'),
+                        Text(rolls.length >= 20 ? rolls[20].toString() : '-'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -101,10 +161,16 @@ class _BowlingScreenState extends State<BowlingScreen> {
                   ElevatedButton(
                     onPressed: () => _addRoll(pins),
                     child: Text(pins.toString()),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.lightGreen,
+                    ),
                   ),
                 ElevatedButton(
                   onPressed: _deleteLastRoll,
                   child: Text('Undo'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                  ),
                 ),
               ],
             ),
