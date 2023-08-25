@@ -31,7 +31,7 @@ class _BowlingScreenState extends State<BowlingScreen> {
       if (rolls.length % 2 == 0 && rolls.length < 18) {
         rolls.add(pins);
         if (pins == 10) {
-          rolls.add(0); // Automatically add a zero for the second roll
+          rolls.add(0);
         }
       } else if (rolls.length % 2 == 1 &&
           rolls.length < 18 &&
