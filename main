@@ -27,9 +27,21 @@ class _BowlingScreenState extends State<BowlingScreen> {
   int maxPossibleScore = 300;
 
   void _addRoll(int pins) {
-    setState(() {
+    if (rolls.length % 2 == 0 && rolls.length < 18) {
       rolls.add(pins);
-    });
+    } else if (rolls.length % 2 == 1 &&
+        rolls.length < 18 &&
+        rolls.last + pins <= 10) {
+      rolls.add(pins);
+    } else if (rolls.length == 18) {
+      rolls.add(pins);
+    } else if (rolls.length == 19 && rolls[18] == 10) {
+      rolls.add(pins);
+    } else if (rolls.length == 20 && rolls[18] + rolls[19] >= 10) {
+      rolls.add(pins);
+    }
+
+    setState(() {});
   }
 
   void _deleteLastRoll() {
@@ -98,7 +110,7 @@ class _BowlingScreenState extends State<BowlingScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  for (int frame = 1; frame <= 9; frame++)
+                  for (int frame = 1; frame <= 10; frame++)
                     Container(
                       margin: EdgeInsets.all(8),
                       padding: EdgeInsets.all(8),
@@ -117,12 +129,16 @@ class _BowlingScreenState extends State<BowlingScreen> {
                           ),
                           Text(
                             rolls.length >= (frame - 1) * 2 + 1
-                                ? rolls[(frame - 1) * 2].toString()
+                                ? rolls[(frame - 1) * 2] == 10
+                                    ? 'X'
+                                    : rolls[(frame - 1) * 2].toString()
                                 : '-',
                           ),
                           Text(
                             rolls.length >= (frame - 1) * 2 + 2
-                                ? rolls[(frame - 1) * 2 + 1].toString()
+                                ? rolls[(frame - 1) * 2 + 1] == 10
+                                    ? 'X'
+                                    : rolls[(frame - 1) * 2 + 1].toString()
                                 : '-',
                           ),
                         ],
