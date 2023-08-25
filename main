@@ -27,21 +27,25 @@ class _BowlingScreenState extends State<BowlingScreen> {
   int maxPossibleScore = 300;
 
   void _addRoll(int pins) {
-    if (rolls.length % 2 == 0 && rolls.length < 18) {
-      rolls.add(pins);
-    } else if (rolls.length % 2 == 1 &&
-        rolls.length < 18 &&
-        rolls.last + pins <= 10) {
-      rolls.add(pins);
-    } else if (rolls.length == 18) {
-      rolls.add(pins);
-    } else if (rolls.length == 19 && rolls[18] == 10) {
-      rolls.add(pins);
-    } else if (rolls.length == 20 && rolls[18] + rolls[19] >= 10) {
-      rolls.add(pins);
+    if (rolls.length < 20) {
+      if (rolls.length % 2 == 0 && rolls.length < 18) {
+        rolls.add(pins);
+        if (pins == 10) {
+          rolls.add(0); // Automatically add a zero for the second roll
+        }
+      } else if (rolls.length % 2 == 1 &&
+          rolls.length < 18 &&
+          rolls.last + pins <= 10) {
+        rolls.add(pins);
+      } else if (rolls.length == 18) {
+        rolls.add(pins);
+      } else if (rolls.length == 19 && rolls[18] == 10) {
+        rolls.add(pins);
+      } else if (rolls.length == 20 && rolls[18] + rolls[19] >= 10) {
+        rolls.add(pins);
+      }
+      setState(() {});
     }
-
-    setState(() {});
   }
 
   void _deleteLastRoll() {
