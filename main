@@ -84,6 +84,21 @@ class _BowlingScreenState extends State<BowlingScreen> {
     return score;
   }
 
+  String _getDisplayValue(int rollIndex) {
+    if (rolls.length > rollIndex) {
+      if (rolls[rollIndex] == 10) {
+        return 'X';
+      } else if (rolls[rollIndex] +
+              (rolls.length > rollIndex + 1 ? rolls[rollIndex + 1] : 0) ==
+          10) {
+        return '/';
+      } else {
+        return rolls[rollIndex].toString();
+      }
+    }
+    return '-';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
