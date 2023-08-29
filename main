@@ -85,19 +85,18 @@ class _BowlingScreenState extends State<BowlingScreen> {
   }
 
   String _getDisplayValue(int rollIndex) {
-    if (rolls.length > rollIndex) {
-      if (rolls[rollIndex] == 10) {
-        return 'X';
-      } else if (rolls[rollIndex] +
-              (rolls.length > rollIndex + 1 ? rolls[rollIndex + 1] : 0) ==
-          10) {
-        return '/';
-      } else {
-        return rolls[rollIndex].toString();
-      }
+  if (rolls.length > rollIndex) {
+    if (rolls[rollIndex] == 10) {
+      return 'X';
+    } else if (rollIndex % 2 == 0 && rolls[rollIndex] + rolls[rollIndex + 1] == 10) {
+      return '/';
+    } else {
+      return rolls[rollIndex].toString();
     }
-    return '-';
   }
+  return '-';
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -179,9 +178,9 @@ class _BowlingScreenState extends State<BowlingScreen> {
                           'Frame 10',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Text(rolls.length >= 18 ? rolls[18].toString() : '-'),
-                        Text(rolls.length >= 19 ? rolls[19].toString() : '-'),
-                        Text(rolls.length >= 20 ? rolls[20].toString() : '-'),
+Text(rolls.length > 18 ? _getDisplayValue(18) : '-'),
+Text(rolls.length > 19 ? _getDisplayValue(19) : '-'),
+Text(rolls.length > 20 ? _getDisplayValue(20) : '-'),
                       ],
                     ),
                   ),
